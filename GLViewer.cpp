@@ -89,9 +89,13 @@ void SW::GLViewer::init()
     enum{Vertices, Color, Elements, NumVBOs};
     GLuint buffers[NumVBOs];
 
+    // glew init is very important or errors occur
     glewInit();
+
+    // generate vertex arrays, and each array is corresponding to a object to be render
     glGenVertexArrays(1, &arrayId);
 
+    // 3D world coordinate of points
     GLfloat Verts[][3] = {
         {-1.0, -1.0, -1.0},
         {-1.0, -1.0, 1.0},
@@ -102,6 +106,8 @@ void SW::GLViewer::init()
         {1.0, 1.0, -1.0},
         {1.0, 1.0, 1.0},
     };
+
+    // colors of points
     GLfloat Colors[][3] = {
         {0.0, 0.0, 0.0},
         {0.0, 0.0, 1.0},
@@ -113,6 +119,7 @@ void SW::GLViewer::init()
         {1.0, 1.0, 1.0},
     };
 
+    // indices of points
     GLubyte Indices[]={
         0, 1, 3, 2,
         4, 6, 7, 5,
@@ -122,20 +129,27 @@ void SW::GLViewer::init()
         1, 5, 7, 3,
     };
 
+    // active a vertex array
     glBindVertexArray(arrayId);
+
+    // generate buffer objects, and each attribute(vertices, color, and normal..) is corresponding to one buffer
     glGenBuffers(NumVBOs, buffers);
 
+    // active a buffer object
     glBindBuffer(GL_ARRAY_BUFFER, buffers[Vertices]);
+    // alloc a space for buffer
     glBufferData(GL_ARRAY_BUFFER, sizeof(Verts), Verts, GL_STATIC_DRAW);
+    // put the data into the corresponding buffer
     glVertexPointer(3, GL_FLOAT, 0, BUFFER_OFFSET(0));
     glEnableClientState(GL_VERTEX_ARRAY);
 
+    // buffer for colors
     glBindBuffer(GL_ARRAY_BUFFER, buffers[Color]);
     glBufferData(GL_ARRAY_BUFFER, sizeof(Colors), Colors, GL_STATIC_DRAW);
     glColorPointer(3, GL_FLOAT, 0, BUFFER_OFFSET(0));
     glEnableClientState(GL_COLOR_ARRAY);
 
-
+    // buffer for elements
     numElement = sizeof(Indices)/sizeof(Indices[0]);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buffers[Elements]);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(Indices), Indices, GL_STATIC_DRAW);
@@ -151,7 +165,12 @@ void SW::GLViewer::draw()
 
     drawAxises(0.1, 0.1);
 
+    // active the vertex array
     glBindVertexArray(arrayId);
+
+
+    // drawelements
+    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
     glDrawElements(GL_QUADS, numElement,  GL_UNSIGNED_BYTE, BUFFER_OFFSET(0));
 
     glFlush();
