@@ -14,3 +14,8 @@ Mainwindow.h: defines the Mainwindow class
 Mainwindow.cpp: implement class members related to Mainwindow class.
 
 main.cpp: run the mainwindow classs 
+
+
+GLViewer.cpp:  add <QGLFunctions> will undefine some functions in "glew.h", such as  glGenBuffers, glBindBuffer and glBufferData. I have found that, Qt has it's own version of 
+              functions for buffer object, however it contains no functions about vertex array. And hence we have to inlcude "glew.h" for vertex array functions and include 
+              <QGLFunctions> for buffer object fucntions. 
