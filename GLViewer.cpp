@@ -1,9 +1,12 @@
+#include<GL/glew.h>
+#include<GL/gl.h>
+#include<GL/glu.h>
+#include<GL/freeglut.h>
 
 #include"GLViewer.h"
 #include <string>
 
 #include<stdlib.h>
-
 #include<fstream>
 #include<sstream>
 
@@ -18,17 +21,15 @@
 #include<QApplication> // qaApp
 #include<QTextStream>
 
-
-#include<GL/gl.h>
-#include<GL/glu.h>
-#include<GL/freeglut.h>
 #include<time.h>
 #include<sstream>
 #include<cassert>
 
+GLuint arrayId;
+GLuint numElement;
 
-
-
+#define BUFFER_OFFSET(offset)  ((GLvoid*) NULL + offset)
+#define NumberOf(array) (sizeof(array)/sizeof(array[0])
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //SW::GLViewer::GLViewer(QWidget *parent, const char * name, Qt::WFlags f)
@@ -85,6 +86,61 @@ void SW::GLViewer::init()
 
     glEnable(GL_DEPTH_TEST);
 
+    enum{Vertices, Color, Elements, NumVBOs};
+    GLuint buffers[NumVBOs];
+
+    glewInit();
+    glGenVertexArrays(1, &arrayId);
+
+    GLfloat Verts[][3] = {
+        {-1.0, -1.0, -1.0},
+        {-1.0, -1.0, 1.0},
+        {-1.0, 1.0, -1.0},
+        {-1.0, 1.0, 1.0},
+        {1.0,  -1.0, -1.0},
+        {1.0, -1.0, 1.0},
+        {1.0, 1.0, -1.0},
+        {1.0, 1.0, 1.0},
+    };
+    GLfloat Colors[][3] = {
+        {0.0, 0.0, 0.0},
+        {0.0, 0.0, 1.0},
+        {0.0, 1.0, 0.0},
+        {0.0, 1.0, 1.0},
+        {1.0, 0.0, 0.0},
+        {1.0, 0.0, 1.0},
+        {1.0, 1.0, 0.0},
+        {1.0, 1.0, 1.0},
+    };
+
+    GLubyte Indices[]={
+        0, 1, 3, 2,
+        4, 6, 7, 5,
+        2, 3, 7, 6,
+        0, 4, 5, 1,
+        0, 2, 6, 4,
+        1, 5, 7, 3,
+    };
+
+    glBindVertexArray(arrayId);
+    glGenBuffers(NumVBOs, buffers);
+
+    glBindBuffer(GL_ARRAY_BUFFER, buffers[Vertices]);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(Verts), Verts, GL_STATIC_DRAW);
+    glVertexPointer(3, GL_FLOAT, 0, BUFFER_OFFSET(0));
+    glEnableClientState(GL_VERTEX_ARRAY);
+
+    glBindBuffer(GL_ARRAY_BUFFER, buffers[Color]);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(Colors), Colors, GL_STATIC_DRAW);
+    glColorPointer(3, GL_FLOAT, 0, BUFFER_OFFSET(0));
+    glEnableClientState(GL_COLOR_ARRAY);
+
+
+    numElement = sizeof(Indices)/sizeof(Indices[0]);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buffers[Elements]);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(Indices), Indices, GL_STATIC_DRAW);
+
+
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -94,6 +150,9 @@ void SW::GLViewer::draw()
     glDisable(GL_LIGHTING);
 
     drawAxises(0.1, 0.1);
+
+    glBindVertexArray(arrayId);
+    glDrawElements(GL_QUADS, numElement,  GL_UNSIGNED_BYTE, BUFFER_OFFSET(0));
 
     glFlush();
 }
@@ -141,15 +200,15 @@ void SW::GLViewer::drawAxises(double width, double length)
 
     //qglColor(Qt::red);
     glColor3f(1.0, 0.0, 0.0);
-    renderText(axisLength, 0.0, 0.0, "X", QFont("helvetica", 12, QFont::Bold, TRUE));
+    //renderText(axisLength, 0.0, 0.0, "X", QFont("helvetica", 12, QFont::Bold, TRUE));
 
     //qglColor(Qt::green);
     glColor3f(0.0, 1.0, 0.0);
-    renderText(0.0, axisLength, 0.0, "Y", QFont("helvetica", 12, QFont::Bold, TRUE));
+   // renderText(0.0, axisLength, 0.0, "Y", QFont("helvetica", 12, QFont::Bold, TRUE));
 
     //qglColor(Qt::blue);
     glColor3f(0.0, 0.0, 1.0);
-    renderText(0.0, 0.0, axisLength, "Z", QFont("helvetica", 12, QFont::Bold, TRUE));
+   // renderText(0.0, 0.0, axisLength, "Z", QFont("helvetica", 12, QFont::Bold, TRUE));
 
 }
 
