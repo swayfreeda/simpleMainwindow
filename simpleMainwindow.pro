@@ -21,7 +21,7 @@ INCLUDEPATH +=  /usr/include/qt4/QtCore     \
                  /usr/include/qt4/QtXml/
 
 LIBS  +=    -L/usr/X11R6/lib64 -lQtOpenGL -lQtGui -lQtCore  -lpthread\
-             -lQGLViewer  -lglut  -lGL  -lGLU
+             -lQGLViewer  -lGLEW -lglut  -lGL  -lGLU
 
 FORMS += \
     mainwindow.ui
